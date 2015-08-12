@@ -4,7 +4,7 @@ var fs = require("fs");
 var nopt = require("nopt");
 
 var Validator = require("./lib/config/validator");
-var AppServiceRegistration = require("matrix-appservice").AppServiceRegistration;
+var AppService = require("matrix-appservice").AppService;
 var irc = require("./lib/irc-appservice.js");
 var hotReload = require("./lib/hot-reload.js");
 
@@ -92,5 +92,5 @@ if (Boolean(opts["generate-registration"])) {
 }
 else {
     hotReload.setup();
-    irc.runService(config, Boolean(opts["skip-crc-check"]));
+    irc.runService(new AppService(), config, Boolean(opts["skip-crc-check"])).done();
 }

@@ -32,13 +32,12 @@ describe("Creating admin rooms", function() {
     function(done) {
         var botJoinedRoom = false;
         var sdk = env.clientMock._client();
-        sdk.joinRoom.andCallFake(function(roomId) {
-            expect(roomId).toEqual("!adminroomid:here");
+        sdk._onJoinRoom("!adminroomid:here", function() {
             botJoinedRoom = true;
             return q({});
         });
 
-        env.mockAsapiController._trigger("type:m.room.member", {
+        env.appServiceObj._trigger("type:m.room.member", {
             content: {
                 membership: "invite",
             },
@@ -88,20 +87,14 @@ describe("Admin rooms", function() {
 
         // auto-join an admin room
         sdk = env.clientMock._client();
-        sdk.joinRoom.andCallFake(function(roomId) {
-            expect(roomId).toEqual(adminRoomId);
+        sdk._onJoinRoom(adminRoomId, function() {
             return q({});
         });
 
         // do the init
-        env.dbHelper._reset(appConfig.databaseUri).then(function() {
-            env.ircService.configure(appConfig.ircConfig);
-            return env.ircService.register(
-                env.mockAsapiController, appConfig.serviceConfig
-            );
-        }).then(function() {
+        test.initEnv(env).then(function() {
             // auto-setup an admin room
-            return env.mockAsapiController._trigger("type:m.room.member", {
+            return env.appServiceObj._trigger("type:m.room.member", {
                 content: {
                     membership: "invite"
                 },
@@ -112,7 +105,7 @@ describe("Admin rooms", function() {
             });
         }).then(function() {
             // send a message to register the userId on the IRC network
-            return env.mockAsapiController._trigger("type:m.room.message", {
+            return env.appServiceObj._trigger("type:m.room.message", {
                 content: {
                     body: "ping",
                     msgtype: "m.text"
@@ -122,10 +115,8 @@ describe("Admin rooms", function() {
                 type: "m.room.message"
             });
         }).done(function() {
-            console.log("Before each done");
             done();
         });
-        console.log("Before each post");
     });
 
     it("should respond to bad !nick commands with a help notice",
@@ -138,7 +129,7 @@ describe("Admin rooms", function() {
             return q();
         });
 
-        env.mockAsapiController._trigger("type:m.room.message", {
+        env.appServiceObj._trigger("type:m.room.message", {
             content: {
                 body: "!nick blargle",
                 msgtype: "m.text"
@@ -162,7 +153,7 @@ describe("Admin rooms", function() {
             return q();
         });
 
-        env.mockAsapiController._trigger("type:m.room.message", {
+        env.appServiceObj._trigger("type:m.room.message", {
             content: {
                 body: "!join blargle",
                 msgtype: "m.text"
@@ -177,7 +168,7 @@ describe("Admin rooms", function() {
     });
 
     it("should ignore messages sent by the bot", function(done) {
-        env.mockAsapiController._trigger("type:m.room.message", {
+        env.appServiceObj._trigger("type:m.room.message", {
             content: {
                 body: "!join blargle",
                 msgtype: "m.text"
@@ -229,7 +220,7 @@ describe("Admin rooms", function() {
         });
 
         // trigger the request to change the nick
-        env.mockAsapiController._trigger("type:m.room.message", {
+        env.appServiceObj._trigger("type:m.room.message", {
             content: {
                 body: "!nick " + roomMapping.server + " " + newNick,
                 msgtype: "m.text"
@@ -239,7 +230,7 @@ describe("Admin rooms", function() {
             type: "m.room.message"
         }).then(function() {
             // trigger the message which should use the new nick
-            return env.mockAsapiController._trigger("type:m.room.message", {
+            return env.appServiceObj._trigger("type:m.room.message", {
                 content: {
                     body: testText,
                     msgtype: "m.text"
@@ -294,7 +285,7 @@ describe("Admin rooms", function() {
         });
 
         // trigger the request to join a channel
-        env.mockAsapiController._trigger("type:m.room.message", {
+        env.appServiceObj._trigger("type:m.room.message", {
             content: {
                 body: "!join " + roomMapping.server + " " + newChannel,
                 msgtype: "m.text"

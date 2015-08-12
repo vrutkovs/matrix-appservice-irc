@@ -83,7 +83,7 @@ describe("IRC connections", function() {
         });
 
         // send a message to kick start the AS
-        env.mockAsapiController._trigger("type:m.room.message", {
+        env.appServiceObj._trigger("type:m.room.message", {
             content: {
                 body: "A message",
                 msgtype: "m.text"
@@ -132,7 +132,7 @@ describe("IRC connections", function() {
         });
 
         // send a message from matrix to make them join the room.
-        env.mockAsapiController._trigger("type:m.room.message", {
+        env.appServiceObj._trigger("type:m.room.message", {
             content: {
                 body: "A message",
                 msgtype: "m.text"
@@ -175,7 +175,7 @@ describe("IRC connections", function() {
 
         var promises = [];
 
-        promises.push(env.mockAsapiController._trigger("type:m.room.message", {
+        promises.push(env.appServiceObj._trigger("type:m.room.message", {
             content: {
                 body: "A message",
                 msgtype: "m.text"
@@ -185,7 +185,7 @@ describe("IRC connections", function() {
             type: "m.room.message"
         }));
 
-        promises.push(env.mockAsapiController._trigger("type:m.room.message", {
+        promises.push(env.appServiceObj._trigger("type:m.room.message", {
             content: {
                 body: "Another message",
                 msgtype: "m.text"
@@ -253,7 +253,7 @@ describe("IRC connections", function() {
         });
 
         // send a message from the first guy
-        env.mockAsapiController._trigger("type:m.room.message", {
+        env.appServiceObj._trigger("type:m.room.message", {
             content: {
                 body: "A message",
                 msgtype: "m.text"
@@ -263,7 +263,7 @@ describe("IRC connections", function() {
             type: "m.room.message"
         }).then(function() {
             // send a message from the second guy
-            return env.mockAsapiController._trigger("type:m.room.message", {
+            return env.appServiceObj._trigger("type:m.room.message", {
                 content: {
                     body: "Another message",
                     msgtype: "m.text"
@@ -274,7 +274,7 @@ describe("IRC connections", function() {
             });
         }).then(function() {
             // send a message from the first guy
-            return env.mockAsapiController._trigger("type:m.room.message", {
+            return env.appServiceObj._trigger("type:m.room.message", {
                 content: {
                     body: "3rd message",
                     msgtype: "m.text"
@@ -338,7 +338,7 @@ describe("IRC connections", function() {
         });
 
         // send a message to kick start the AS
-        env.mockAsapiController._trigger("type:m.room.message", {
+        env.appServiceObj._trigger("type:m.room.message", {
             content: {
                 body: "A message",
                 msgtype: "m.text"
@@ -347,7 +347,7 @@ describe("IRC connections", function() {
             room_id: roomMapping.roomId,
             type: "m.room.message"
         }).then(function() {
-            return env.mockAsapiController._trigger("type:m.room.message", {
+            return env.appServiceObj._trigger("type:m.room.message", {
                 content: {
                     body: "A message2",
                     msgtype: "m.text"
@@ -402,7 +402,7 @@ describe("IRC connections", function() {
         });
 
         // send a message to kick start the AS
-        var p1 = env.mockAsapiController._trigger("type:m.room.message", {
+        var p1 = env.appServiceObj._trigger("type:m.room.message", {
             content: {
                 body: "A message",
                 msgtype: "m.text"
@@ -411,7 +411,7 @@ describe("IRC connections", function() {
             room_id: roomMapping.roomId,
             type: "m.room.message"
         });
-        var p2 = env.mockAsapiController._trigger("type:m.room.message", {
+        var p2 = env.appServiceObj._trigger("type:m.room.message", {
             content: {
                 body: "A message2",
                 msgtype: "m.text"

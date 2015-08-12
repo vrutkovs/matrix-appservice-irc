@@ -76,7 +76,7 @@ describe("IRC client cycling", function() {
 
     it("should disconnect the oldest (last message time) client",
     function(done) {
-        env.mockAsapiController._trigger("type:m.room.message", {
+        env.appServiceObj._trigger("type:m.room.message", {
             content: {
                 body: "A message",
                 msgtype: "m.text"
@@ -85,7 +85,7 @@ describe("IRC client cycling", function() {
             room_id: roomMapping.roomId,
             type: "m.room.message"
         }).then(function() {
-            return env.mockAsapiController._trigger("type:m.room.message", {
+            return env.appServiceObj._trigger("type:m.room.message", {
                 content: {
                     body: "Another message",
                     msgtype: "m.text"
@@ -95,7 +95,7 @@ describe("IRC client cycling", function() {
                 type: "m.room.message"
             });
         }).then(function() {
-            return env.mockAsapiController._trigger("type:m.room.message", {
+            return env.appServiceObj._trigger("type:m.room.message", {
                 content: {
                     body: "A third message",
                     msgtype: "m.text"
@@ -130,7 +130,7 @@ describe("IRC client cycling", function() {
 
     it("should reconnect (make a new connection) for a cycled-out client when " +
         "speaking and not use the old disconnected client", function(done) {
-        env.mockAsapiController._trigger("type:m.room.message", {
+        env.appServiceObj._trigger("type:m.room.message", {
             content: {
                 body: "A message",
                 msgtype: "m.text"
@@ -139,7 +139,7 @@ describe("IRC client cycling", function() {
             room_id: roomMapping.roomId,
             type: "m.room.message"
         }).then(function() {
-            return env.mockAsapiController._trigger("type:m.room.message", {
+            return env.appServiceObj._trigger("type:m.room.message", {
                 content: {
                     body: "Another message",
                     msgtype: "m.text"
@@ -149,7 +149,7 @@ describe("IRC client cycling", function() {
                 type: "m.room.message"
             });
         }).then(function() {
-            return env.mockAsapiController._trigger("type:m.room.message", {
+            return env.appServiceObj._trigger("type:m.room.message", {
                 content: {
                     body: "A third message",
                     msgtype: "m.text"
@@ -159,7 +159,7 @@ describe("IRC client cycling", function() {
                 type: "m.room.message"
             });
         }).then(function() {
-            return env.mockAsapiController._trigger("type:m.room.message", {
+            return env.appServiceObj._trigger("type:m.room.message", {
                 content: {
                     body: "That first guy is back again.",
                     msgtype: "m.text"

@@ -48,7 +48,7 @@ describe("Matrix-to-IRC PMing", function() {
         ]);
 
         // get the ball rolling
-        env.mockAsapiController._trigger("type:m.room.member", {
+        env.appServiceObj._trigger("type:m.room.member", {
             content: {
                 membership: "invite"
             },
@@ -120,7 +120,7 @@ describe("Matrix-to-IRC PMing", function() {
         ]);
 
         // get the ball rolling
-        env.mockAsapiController._trigger("type:m.room.member", {
+        env.appServiceObj._trigger("type:m.room.member", {
             content: {
                 membership: "invite"
             },
@@ -239,7 +239,7 @@ describe("IRC-to-Matrix PMing", function() {
         test.initEnv(env).then(function() {
             // send a message in the linked room (so the service provisions a
             // virtual IRC user which the 'real' IRC users can speak to)
-            return env.mockAsapiController._trigger("type:m.room.message", {
+            return env.appServiceObj._trigger("type:m.room.message", {
                 content: {
                     body: "get me in",
                     msgtype: "m.text"

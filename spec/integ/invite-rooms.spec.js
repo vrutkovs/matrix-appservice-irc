@@ -44,7 +44,7 @@ describe("Invite-only rooms", function() {
             return q({});
         });
 
-        env.mockAsapiController._trigger("type:m.room.member", {
+        env.appServiceObj._trigger("type:m.room.member", {
             content: {
                 membership: "invite",
             },
@@ -124,7 +124,7 @@ describe("Invite-only rooms", function() {
             ]);
         });
 
-        env.mockAsapiController._trigger("type:m.room.member", {
+        env.appServiceObj._trigger("type:m.room.member", {
             content: {
                 membership: "invite",
             },

@@ -4,6 +4,7 @@
 "use strict";
 var q = require("q");
 var Datastore = require("nedb");
+var store = require("../../lib/store");
 
 /**
  * Reset the database, wiping all data.
@@ -41,5 +42,11 @@ module.exports._reset = function(databaseUri) {
         delDatabase("/irc_clients.db"),
         delDatabase("/rooms.db"),
         delDatabase("/users.db")
-    ]);
+    ]).then(function() {
+        return store.connectToDatabase(databaseUri);
+    }).then(function() {
+        return store.config.set({
+            hsToken: "my_test_token"
+        });
+    });
 };

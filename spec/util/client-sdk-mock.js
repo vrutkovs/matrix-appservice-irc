@@ -57,6 +57,18 @@ module.exports._reset = function() {
         mxcUrlToHttp: jasmine.createSpy("sdk.mxcUrlToHttp(mxc, w, h, method)")
     };
 
+    var roomIdToFn = {};
+    mockClient.joinRoom.andCallFake(function(roomId) {
+        var fn = roomIdToFn[roomId];
+        if (fn) {
+            return fn(mockClient);
+        }
+        console.error("No handler for joinRoom(%s)", roomId);
+    });
+    mockClient._onJoinRoom = function(roomId, fn) {
+        roomIdToFn[roomId] = fn;
+    };
+
     // mock up getStateEvent immediately since it is called for every new IRC
     // connection.
     mockClient.getStateEvent.andCallFake(function() {

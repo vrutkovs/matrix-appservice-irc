@@ -1,6 +1,7 @@
 // common tasks performed in tests
 "use strict";
 var extend = require("extend");
+var q = require("q");
 var proxyquire = require('proxyquire');
 
 /**
@@ -13,15 +14,14 @@ module.exports.mkEnv = function() {
     var ircMock = require("./irc-client-mock");
     ircMock["@global"] = true;
     var dbHelper = require("./db-helper");
-    var asapiMock = require("./asapi-controller-mock");
     var appConfig = extend(true, {}, require("../util/config-mock"));
     return {
         appConfig: appConfig,
-        asapiMock: asapiMock,
         dbHelper: dbHelper,
         ircMock: ircMock,
         clientMock: clientMock,
-        mockAsapiController: null
+        appServiceObj: null,
+        appServiceMock: require("./app-service-mock")
     };
 };
 
@@ -35,10 +35,14 @@ module.exports.mkEnv = function() {
 module.exports.initEnv = function(env) {
     // wipe the database entirely then call configure and register on the IRC
     // service.
+    var sdk = env.clientMock._client();
     return env.dbHelper._reset(env.appConfig.databaseUri).then(function() {
-        env.ircService.configure(env.appConfig.ircConfig);
-        return env.ircService.register(
-            env.mockAsapiController, env.appConfig.serviceConfig
+        // auto join mapped matrix rooms from the config
+        sdk._onJoinRoom(env.appConfig.roomMapping.roomId, function() {
+            return q({room_id: env.appConfig.roomMapping.roomId});
+        });
+        return env.ircService.runService(
+            env.appServiceObj, env.appConfig.ircConfig, true
         );
     }).catch(function(e) {
         var msg = JSON.stringify(e);
@@ -74,7 +78,7 @@ module.exports.beforeEach = function(testCase, env) {
             "matrix-js-sdk": env.clientMock,
             "irc": env.ircMock
         });
-        env.mockAsapiController = env.asapiMock.create();
+        env.appServiceObj = env.appServiceMock.create();
     }
 };
 

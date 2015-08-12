@@ -56,7 +56,7 @@ describe("Mirroring", function() {
                 client._invokeCallback(cb);
             });
 
-            env.mockAsapiController._trigger("type:m.room.member", {
+            env.appServiceObj._trigger("type:m.room.member", {
                 content: {
                     membership: "join"
                 },
@@ -84,7 +84,7 @@ describe("Mirroring", function() {
                 client._invokeCallback(cb);
             });
 
-            env.mockAsapiController._trigger("type:m.room.message", {
+            env.appServiceObj._trigger("type:m.room.message", {
                 content: {
                     body: "dummy text to get it to join",
                     msgtype: "m.text"
@@ -93,7 +93,7 @@ describe("Mirroring", function() {
                 room_id: roomMapping.roomId,
                 type: "m.room.message"
             }).then(function() {
-                return env.mockAsapiController._trigger("type:m.room.member", {
+                return env.appServiceObj._trigger("type:m.room.member", {
                     content: {
                         membership: "leave"
                     },
@@ -119,7 +119,7 @@ describe("Mirroring", function() {
                 expect(false).toBe(true, "IRC client parted but shouldn't have.");
             });
 
-            env.mockAsapiController._trigger("type:m.room.member", {
+            env.appServiceObj._trigger("type:m.room.member", {
                 content: {
                     membership: "join"
                 },
@@ -143,7 +143,7 @@ describe("Mirroring", function() {
                 expect(false).toBe(true, "IRC client parted but shouldn't have.");
             });
 
-            env.mockAsapiController._trigger("type:m.room.member", {
+            env.appServiceObj._trigger("type:m.room.member", {
                 content: {
                     membership: "leave"
                 },

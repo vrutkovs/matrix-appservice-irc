@@ -70,7 +70,7 @@ describe("Dynamic channels", function() {
             return q({});
         });
 
-        env.mockAsapiController._queryAlias(tAlias).done(function() {
+        env.appServiceObj.onAliasQuery(tAlias).done(function() {
             if (joinedIrcChannel) {
                 done();
             }
@@ -125,8 +125,8 @@ describe("Dynamic channels", function() {
             return q({});
         });
 
-        env.mockAsapiController._queryAlias(tAlias).then(function() {
-            return env.mockAsapiController._queryAlias(tCapsAlias);
+        env.appServiceObj.onAliasQuery(tAlias).then(function() {
+            return env.appServiceObj.onAliasQuery(tCapsAlias);
         }).done(function() {
             expect(madeAlias).toBe(true, "Failed to create alias");
             done();
@@ -155,13 +155,7 @@ describe("Dynamic channels (disabled)", function() {
             roomMapping.server, testUser.nick, roomMapping.channel
         );
 
-        // do the init
-        env.dbHelper._reset(appConfig.databaseUri).then(function() {
-            env.ircService.configure(appConfig.ircConfig);
-            return env.ircService.register(
-                env.mockAsapiController, appConfig.serviceConfig
-            );
-        }).done(function() {
+        test.initEnv(env).done(function() {
             done();
         });
     });
@@ -198,7 +192,7 @@ describe("Dynamic channels (disabled)", function() {
             return q({});
         });
 
-        env.mockAsapiController._queryAlias(tAlias).catch(function() {
+        env.appServiceObj.onAliasQuery(tAlias).catch(function() {
             expect(joinedIrcChannel).toBe(false, "Joined channel by alias");
             done();
         });

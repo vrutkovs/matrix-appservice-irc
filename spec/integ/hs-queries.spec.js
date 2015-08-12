@@ -51,7 +51,7 @@ describe("Homeserver user queries", function() {
             returnUserId: testUserId
         });
 
-        env.mockAsapiController._queryUser(testUserId).done(function(res) {
+        env.appServiceObj.onUserQuery(testUserId).done(function(res) {
             done();
         });
     });
@@ -108,7 +108,7 @@ describe("Homeserver alias queries", function() {
             }
         });
 
-        env.mockAsapiController._queryAlias(testAlias).done(function() {
+        env.appServiceObj.onAliasQuery(testAlias).done(function() {
             expect(botJoined).toBe(true, "Bot didn't join " + testChannel);
             done();
         }, function(err) {

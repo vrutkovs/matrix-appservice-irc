@@ -2,6 +2,7 @@
  * Contains integration tests for all Startup-initiated events.
  */
 "use strict";
+var q = require("q");
 var test = require("../util/test");
 
 // set up integration testing mocks
@@ -20,6 +21,13 @@ describe("Initialisation", function() {
 
     beforeEach(function(done) {
         test.beforeEach(this, env);
+
+        // auto join mapped matrix rooms from the config
+        var sdk = env.clientMock._client();
+        sdk._onJoinRoom(env.appConfig.roomMapping.roomId, function() {
+            return q({room_id: env.appConfig.roomMapping.roomId});
+        });
+
         env.dbHelper._reset(databaseUri).done(function() {
             done();
         });
@@ -45,9 +53,8 @@ describe("Initialisation", function() {
         });
 
         // run the test
-        env.ircService.configure(ircConfig);
-        env.ircService.register(
-            env.mockAsapiController, appConfig.serviceConfig
+        env.ircService.runService(
+            env.appServiceObj, env.appConfig.ircConfig, true
         );
     });
 
@@ -78,9 +85,8 @@ describe("Initialisation", function() {
         });
 
         // run the test
-        env.ircService.configure(ircConfig);
-        env.ircService.register(
-            env.mockAsapiController, appConfig.serviceConfig
+        env.ircService.runService(
+            env.appServiceObj, env.appConfig.ircConfig, true
         );
     });
 });

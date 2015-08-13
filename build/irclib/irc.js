@@ -116,9 +116,8 @@ IrcLib.prototype.sendAction = function (ircRoom, bridgedClient, action) {
 var getChannelsToJoin = function getChannelsToJoin(server) {
     if (server.shouldJoinChannelsIfNoUsers()) {
         return store.rooms.getTrackedChannelsForServer(server.domain);
-    } else {
-        return membershiplists.getChannelsToJoin(server);
     }
+    return membershiplists.getChannelsToJoin(server);
 };
 
 var loginToServer = function loginToServer(server) {
@@ -153,7 +152,7 @@ var loginToServer = function loginToServer(server) {
     })["catch"](log.logErr);
 };
 
-var getBotClient = function getBotClient(server) {
+function getBotClient(server) {
     var botClient = pool.getBot(server);
     if (botClient) {
         return q(botClient);
@@ -165,7 +164,7 @@ var getBotClient = function getBotClient(server) {
         defer.reject(err);
     });
     return defer.promise;
-};
+}
 
 module.exports.connect = function () {
     var defer = q.defer();
@@ -230,9 +229,9 @@ var userIdToServerNick = function userIdToServerNick(userId) {
     };
 };
 
-var getServerForAlias = function getServerForAlias(alias, servers) {
-    for (var i = 0; i < servers.length; i++) {
-        var server = servers[i];
+var getServerForAlias = function getServerForAlias(alias, serverList) {
+    for (var i = 0; i < serverList.length; i++) {
+        var server = serverList[i];
         if (server.claimsAlias(alias)) {
             return server;
         }

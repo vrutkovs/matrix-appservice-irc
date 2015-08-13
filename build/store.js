@@ -45,43 +45,43 @@ var callbackFn = function callbackFn(d, err, result) {
     }
 };
 
-var insert = function insert(collection, d, objects) {
-    collection.insert(objects, function (err, result) {
+var insert = function insert(database, d, objects) {
+    database.insert(objects, function (err, result) {
         callbackFn(d, err, result);
     });
 };
-var upsert = function upsert(collection, d, query, update) {
-    collection.update(query, update, { upsert: true }, function (err, result) {
+var upsert = function upsert(database, d, query, updateVals) {
+    database.update(query, updateVals, { upsert: true }, function (err, result) {
         callbackFn(d, err, result);
     });
 };
-var _update2 = function update(collection, d, query, _update) {
-    collection.update(query, _update, { upsert: false }, function (err, result) {
+var _update = function _update(database, d, query, updateVals) {
+    database.update(query, updateVals, { upsert: false }, function (err, result) {
         callbackFn(d, err, result);
     });
 };
-var del = function del(collection, d, query) {
-    collection.remove(query, { multi: true }, function (err, result) {
+var del = function del(database, d, query) {
+    database.remove(query, { multi: true }, function (err, result) {
         log.info("Removed %s entries", JSON.stringify(result));
         callbackFn(d, err, result);
     });
 };
 
 /**
- * @param {!Object} collection : The database collection to search.
+ * @param {!Object} database : The database collection to search.
  * @param {Deferred} d : The deferred to resolve/reject on completion.
  * @param {!Object} query : The query to execute.
  * @param {boolean} multiple : True to return multiple entries.
  * @param {Function=} transformFn : Optional. The function to invoke to transform
  * each result.
  */
-var select = function select(collection, d, query, multiple, transformFn) {
+var select = function select(database, d, query, multiple, transformFn) {
     if (multiple) {
-        collection.find(query, function (err, docs) {
+        database.find(query, function (err, docs) {
             callbackFn(d, err, transformFn ? transformFn(docs) : docs);
         });
     } else {
-        collection.findOne(query, function (err, docs) {
+        database.findOne(query, function (err, docs) {
             callbackFn(d, err, transformFn ? transformFn(docs) : docs);
         });
     }
@@ -276,7 +276,7 @@ module.exports.rooms = {
             virtual_user_id: virtualUserId
         }, false, function (doc) {
             if (!doc) {
-                return;
+                return null;
             }
             return new MatrixRoom(doc.room_id);
         });
@@ -333,7 +333,7 @@ module.exports.rooms = {
             room_id: roomId
         }, false, function (doc) {
             if (!doc) {
-                return;
+                return null;
             }
             return new MatrixRoom(doc.room_id);
         });
@@ -371,7 +371,7 @@ module.exports.users = {
             localpart: userLocalpart
         }, false, function (doc) {
             if (!doc) {
-                return;
+                return null;
             }
             return new MatrixUser(doc.user_id, doc.display_name, true);
         });
@@ -404,11 +404,11 @@ module.exports.ircClients = {
             domain: domain
         }, false, function (doc) {
             if (!doc) {
-                return;
+                return null;
             }
             var server = serverMappings[doc.domain];
             if (!server) {
-                return;
+                return null;
             }
             return new IrcUser(server, doc.nick, true, doc.password, doc.username);
         });
@@ -438,7 +438,7 @@ module.exports.ircClients = {
         var setVals = {};
         setVals[key] = newVal;
 
-        _update2(getCollection("irc_clients"), d, {
+        _update(getCollection("irc_clients"), d, {
             user_id: userId,
             domain: domain
         }, {
@@ -453,11 +453,11 @@ module.exports.ircClients = {
             username: username
         }, false, function (doc) {
             if (!doc) {
-                return;
+                return null;
             }
             var server = serverMappings[doc.domain];
             if (!server) {
-                return;
+                return null;
             }
             var usr = new IrcUser(server, doc.nick, true, doc.password, doc.username);
             usr.userId = doc.user_id; // FIXME: bodge

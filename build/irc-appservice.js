@@ -122,7 +122,7 @@ module.exports.startup = function (as, servers, dbToken, config) {
     as.on("type:m.room.topic", matrixToIrc.onMessage);
     as.on("type:m.room.member", function (event) {
         if (!event.content || !event.content.membership) {
-            return;
+            return q.reject("Malformed member event");
         }
         var target = new MatrixUser(event.state_key, null, null);
         var sender = new MatrixUser(event.user_id, null, null);

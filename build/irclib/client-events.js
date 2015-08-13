@@ -278,7 +278,7 @@ module.exports.addHooks = function (client, connInst, callbacks) {
         var name = namesBucket.pop(); // LIFO but who cares
         if (!name) {
             processingBucket = false;
-            return;
+            return null;
         }
         client.log.debug("Pop %s/%s from names bucket (%s remaining)", name.nick, name.chan, namesBucket.length);
         return callbacks.onJoin(server, createUser(name.nick), name.chan, "names");

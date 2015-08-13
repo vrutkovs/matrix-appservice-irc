@@ -105,7 +105,7 @@ module.exports.matrix = {
 module.exports.toMatrix = function (action) {
     if (action.protocol !== "irc") {
         log.error("Bad src protocol: %s", action.protocol);
-        return;
+        return null;
     }
     var opts = {};
     switch (action.action) {
@@ -127,7 +127,7 @@ module.exports.toMatrix = function (action) {
             break;
         default:
             log.error("IRC->MX: Unknown action: %s", action.action);
-            return;
+            return null;
     }
 
     return createMatrixAction(action.action, opts);
@@ -137,7 +137,7 @@ module.exports.toMatrix = function (action) {
 module.exports.toIrc = function (action) {
     if (action.protocol !== "matrix") {
         log.error("Bad src protocol: %s", action.protocol);
-        return;
+        return null;
     }
     var opts = {};
     switch (action.action) {
@@ -166,7 +166,7 @@ module.exports.toIrc = function (action) {
             break;
         default:
             log.error("MX->IRC: Unknown action: %s", action.action);
-            return;
+            return null;
     }
 
     return createIrcAction(action.action, opts);

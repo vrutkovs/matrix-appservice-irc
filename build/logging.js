@@ -158,7 +158,7 @@ module.exports = {
                 reqId: requestId,
                 dir: isFromIrc ? "[I->M] " : "[M->I] "
             };
-            fn.apply(this, newArgs);
+            fn.apply(baseLogger, newArgs);
         };
 
         return {

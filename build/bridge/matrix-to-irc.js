@@ -125,14 +125,13 @@ var handleInviteFromUser = function handleInviteFromUser(event, req, invitedIrcU
             // nick is the channel
             var ircRoom = new IrcRoom(invitedIrcUser.server, invitedIrcUser.nick);
             return store.rooms.setPmRoom(ircRoom, mxRoom, event.user_id, event.state_key);
-        } else {
-            req.log.error("This room isn't a 1:1 chat!");
-            // whine that you don't do group chats and leave.
-            var notice = actions.matrix.createNotice("Group chat not supported.");
-            req.mxLib.sendAction(mxRoom, invitedUser, notice)["finally"](function () {
-                req.mxLib.leaveRoom(invitedUser.userId, event.room_id).done(req.sucFn, req.errFn);
-            });
         }
+        req.log.error("This room isn't a 1:1 chat!");
+        // whine that you don't do group chats and leave.
+        var notice = actions.matrix.createNotice("Group chat not supported.");
+        req.mxLib.sendAction(mxRoom, invitedUser, notice)["finally"](function () {
+            req.mxLib.leaveRoom(invitedUser.userId, event.room_id).done(req.sucFn, req.errFn);
+        });
     }).done(req.sucFn, req.errFn);
 };
 
@@ -172,7 +171,7 @@ var onAdminMessage = function onAdminMessage(event, req, adminRoom) {
             }
             var notice = actions.matrix.createNotice("Format: '!nick irc.example.com DesiredNick'\n" + connectedNetworksStr);
             req.mxLib.sendAction(adminRoom, botUser, notice).done(req.sucFn, req.errFn);
-            return;
+            return req.defer.promise;
         }
         req.log.info("%s wants to change their nick on %s to %s", event.user_id, ircServer.domain, nick);
 
@@ -186,14 +185,12 @@ var onAdminMessage = function onAdminMessage(event, req, adminRoom) {
         req.ircLib.getBridgedClient(ircServer, event.user_id).then(function (bridgedClient) {
             return bridgedClient.changeNick(nick);
         }).then(function (response) {
-            var notice = actions.matrix.createNotice(response);
-            return req.mxLib.sendAction(adminRoom, botUser, notice);
+            return req.mxLib.sendAction(adminRoom, botUser, actions.matrix.createNotice(response));
         }, function (err) {
             if (err.stack) {
                 log.logErr(err);
             }
-            var notice = actions.matrix.createNotice(JSON.stringify(err));
-            return req.mxLib.sendAction(adminRoom, botUser, notice);
+            return req.mxLib.sendAction(adminRoom, botUser, actions.matrix.createNotice(JSON.stringify(err)));
         }).done(req.sucFn, req.errFn);
     } else if (event.content.body.indexOf("!join") === 0) {
         // TODO: Code dupe from !nick
@@ -212,7 +209,7 @@ var onAdminMessage = function onAdminMessage(event, req, adminRoom) {
         }
         if (errText) {
             req.mxLib.sendAction(adminRoom, botUser, actions.matrix.createNotice(errText)).done(req.sucFn, req.errFn);
-            return;
+            return req.defer.promise;
         }
         req.log.info("%s wants to join the channel %s on %s", event.user_id, ircChannel, server.domain);
         // track the channel if we aren't already
@@ -245,6 +242,7 @@ var onAdminMessage = function onAdminMessage(event, req, adminRoom) {
         req.log.info("No valid admin command: %s", event.content.body);
         req.sucFn();
     }
+    return req.defer.promise;
 };
 
 /**

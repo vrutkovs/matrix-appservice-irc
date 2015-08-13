@@ -73,21 +73,21 @@ module.exports.setClientConfig = function (config) {
     }, baseClientConfig)));
 };
 
-var setClientForRequest = function setClientForRequest(requestId, userIdKey, sdkClient) {
+function setClientForRequest(requestId, userIdKey, sdkClient) {
     if (!clients[requestId]) {
         clients[requestId] = {};
     }
     sdkClient.credentials._reqId = requestId;
     clients[requestId][userIdKey] = sdkClient;
-};
+}
 
-var getClientForRequest = function getClientForRequest(requestId, userIdKey) {
+function getClientForRequest(requestId, userIdKey) {
     if (clients[requestId] && clients[requestId][userIdKey]) {
         return clients[requestId][userIdKey];
     }
-};
+}
 
-var logResponse = function logResponse(log, opts, err, response, body) {
+function logResponse(log, opts, err, response, body) {
     var httpCode = response ? response.statusCode : null;
     var userId = opts.qs ? opts.qs.user_id || null : null;
     if (err) {
@@ -100,4 +100,4 @@ var logResponse = function logResponse(log, opts, err, response, body) {
         log.debug( // body may be large, so do first 80 chars
         "HTTP %s : %s", httpCode, JSON.stringify(body).substring(0, 80));
     }
-};
+}

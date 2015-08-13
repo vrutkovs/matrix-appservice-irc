@@ -314,12 +314,12 @@ BridgedClient.prototype._onConnectionCreated = function (connInst, nameInfo, cal
 };
 module.exports.BridgedClient = BridgedClient;
 
-var setTopic = function setTopic(self, room, topic) {
+var setTopic = function setTopic(bridgedClient, room, topic) {
     // join the room if we haven't already
     var defer = q.defer();
-    joinChannel(self, room.channel).done(function () {
-        self.log.info("Setting topic to %s in channel %s", topic, room.channel);
-        self.unsafeClient.send("TOPIC", room.channel, topic);
+    joinChannel(bridgedClient, room.channel).done(function () {
+        bridgedClient.log.info("Setting topic to %s in channel %s", topic, room.channel);
+        bridgedClient.unsafeClient.send("TOPIC", room.channel, topic);
         defer.resolve();
     }, function (e) {
         defer.reject(e);
@@ -327,52 +327,52 @@ var setTopic = function setTopic(self, room, topic) {
     return defer.promise;
 };
 
-var sendMessage = function sendMessage(self, room, msgType, text) {
+var sendMessage = function sendMessage(bridgedClient, room, msgType, text) {
     // join the room if we haven't already
     var defer = q.defer();
     msgType = msgType || "message";
-    self._connectDefer.promise.then(function () {
-        return joinChannel(self, room.channel);
+    bridgedClient._connectDefer.promise.then(function () {
+        return joinChannel(bridgedClient, room.channel);
     }).done(function () {
         if (msgType == "action") {
-            self.unsafeClient.action(room.channel, text);
+            bridgedClient.unsafeClient.action(room.channel, text);
         } else if (msgType == "notice") {
-            self.unsafeClient.notice(room.channel, text);
+            bridgedClient.unsafeClient.notice(room.channel, text);
         } else if (msgType == "message") {
-            self.unsafeClient.say(room.channel, text);
+            bridgedClient.unsafeClient.say(room.channel, text);
         }
         defer.resolve();
     });
     return defer.promise;
 };
 
-var joinChannel = function joinChannel(self, channel) {
-    if (!self.unsafeClient) {
+function joinChannel(bridgedClient, channel) {
+    if (!bridgedClient.unsafeClient) {
         return q.reject("No client");
     }
-    if (Object.keys(self.unsafeClient.chans).indexOf(channel) !== -1) {
+    if (Object.keys(bridgedClient.unsafeClient.chans).indexOf(channel) !== -1) {
         return q();
     }
     if (channel.indexOf("#") !== 0) {
         // PM room
         return q();
     }
-    if (self.server.isExcludedChannel(channel)) {
+    if (bridgedClient.server.isExcludedChannel(channel)) {
         return q.reject(channel + " is a do-not-track channel.");
     }
     var defer = q.defer();
-    self.log.debug("Joining channel %s", channel);
-    self._addChannel(channel);
-    var client = self.unsafeClient;
+    bridgedClient.log.debug("Joining channel %s", channel);
+    bridgedClient._addChannel(channel);
+    var client = bridgedClient.unsafeClient;
     // listen for failures to join a channel (e.g. +i, +k)
     var failFn = function failFn(err) {
         if (!err || !err.args) {
             return;
         }
         var failCodes = ["err_nosuchchannel", "err_toomanychannels", "err_channelisfull", "err_inviteonlychan", "err_bannedfromchan", "err_badchannelkey"];
-        self.log.error("Join channel %s : %s", channel, err);
+        bridgedClient.log.error("Join channel %s : %s", channel, err);
         if (failCodes.indexOf(err.command) !== -1 && err.args.indexOf(channel) !== -1) {
-            self.log.error("Cannot track channel %s: %s", channel, err.command);
+            bridgedClient.log.error("Cannot track channel %s: %s", channel, err.command);
             client.removeListener("error", failFn);
             defer.reject(err);
         }
@@ -382,10 +382,10 @@ var joinChannel = function joinChannel(self, channel) {
     // add a timeout to try joining again
     setTimeout(function () {
         // promise isn't resolved yet and we still want to join this channel
-        if (defer.promise.isPending() && self.chanList.indexOf(channel) !== -1) {
-            self.log.error("Timed out trying to join %s - trying again.", channel);
+        if (defer.promise.isPending() && bridgedClient.chanList.indexOf(channel) !== -1) {
+            bridgedClient.log.error("Timed out trying to join %s - trying again.", channel);
             // try joining again.
-            joinChannel(self, channel).done(function (s) {
+            joinChannel(bridgedClient, channel).done(function (s) {
                 defer.resolve(s);
             }, function (e) {
                 defer.reject(e);
@@ -393,12 +393,12 @@ var joinChannel = function joinChannel(self, channel) {
         }
     }, JOIN_TIMEOUT_MS);
 
-    self.unsafeClient.join(channel, function () {
-        self.log.debug("Joined channel %s", channel);
+    bridgedClient.unsafeClient.join(channel, function () {
+        bridgedClient.log.debug("Joined channel %s", channel);
         client.removeListener("error", failFn);
-        var room = new IrcRoom(self.server, channel);
+        var room = new IrcRoom(bridgedClient.server, channel);
         defer.resolve(room);
     });
 
     return defer.promise;
-};
+}

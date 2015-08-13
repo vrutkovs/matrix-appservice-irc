@@ -99,6 +99,6 @@ module.exports.newRequest = function (isFromIrc) {
     return request;
 };
 
-var generateRequestId = function generateRequestId() {
+function generateRequestId() {
     return (Math.random() * 1e20).toString(36);
-};
+}

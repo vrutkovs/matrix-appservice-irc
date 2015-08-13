@@ -154,7 +154,7 @@ function checkClientLimit(server) {
     });
 }
 
-var getNumberOfConnections = function getNumberOfConnections(server) {
+function getNumberOfConnections(server) {
     if (!server || !virtualClients[server.domain]) {
         return 0;
     }
@@ -171,19 +171,19 @@ var getNumberOfConnections = function getNumberOfConnections(server) {
     }).length;
 
     return numConnectedNicks + numConnectingNicks;
-};
+}
 
-var sendConnectionMetric = function sendConnectionMetric(server) {
+function sendConnectionMetric(server) {
     stats.ircClients(server.domain, getNumberOfConnections(server));
-};
+}
 
-var removeVirtualUser = function removeVirtualUser(virtualUser) {
+function removeVirtualUser(virtualUser) {
     var server = virtualUser.server;
     virtualClients[server.domain].userIds[virtualUser.userId] = undefined;
     virtualClients[server.domain].nicks[virtualUser.nick] = undefined;
-};
+}
 
-var onClientConnected = function onClientConnected(virtualUser) {
+function onClientConnected(virtualUser) {
     var server = virtualUser.server;
     var oldNick = virtualUser.nick;
     var actualNick = virtualUser.unsafeClient.nick;
@@ -196,9 +196,9 @@ var onClientConnected = function onClientConnected(virtualUser) {
     if (oldNick !== actualNick) {
         log.debug("Connected with nick '%s' instead of desired nick '%s'", actualNick, oldNick);
     }
-};
+}
 
-var onClientDisconnected = function onClientDisconnected(virtualUser) {
+function onClientDisconnected(virtualUser) {
     removeVirtualUser(virtualUser);
     sendConnectionMetric(virtualUser.server);
 
@@ -226,9 +226,9 @@ var onClientDisconnected = function onClientDisconnected(virtualUser) {
             log.error("<%s> Failed to reconnect %s@%s", cli._id, cli.nick, cli.server.domain);
         });
     }, RECONNECT_TIME_MS);
-};
+}
 
-var onNickChange = function onNickChange(virtualUser, oldNick, newNick) {
+function onNickChange(virtualUser, oldNick, newNick) {
     virtualClients[virtualUser.server.domain].nicks[oldNick] = undefined;
     virtualClients[virtualUser.server.domain].nicks[newNick] = virtualUser;
-};
+}

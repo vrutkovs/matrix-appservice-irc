@@ -221,12 +221,12 @@ module.exports = {
         // TODO: Surely there is a nicer construct than this arrow of doom?
         retryConnection().then(returnClient, function (reason) {
             setTimeout(function () {
-                retryConnection().then(returnClient, function (reason) {
+                retryConnection().then(returnClient, function (reason2) {
                     setTimeout(function () {
-                        retryConnection().then(returnClient, function (reason) {
+                        retryConnection().then(returnClient, function (reason3) {
                             d.reject("Tried 3 connection attempts; failed.");
                         });
-                    }, 5000 + (reason === "throttled" ? THROTTLE_WAIT_MS : 0));
+                    }, 5000 + (reason2 === "throttled" ? THROTTLE_WAIT_MS : 0));
                 });
             }, 2000 + (reason === "throttled" ? THROTTLE_WAIT_MS : 0));
         });

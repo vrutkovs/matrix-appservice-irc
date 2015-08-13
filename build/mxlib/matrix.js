@@ -153,21 +153,19 @@ MatrixLib.prototype.createRoomWithAlias = function (alias, name, topic, joinRule
 
             // For new rooms we want to set the join_rules and
             // history_visibility state
-            return setJoinRule(client, roomId, joinRuleToSet).then(function (roomId) {
+            return setJoinRule(client, roomId, joinRuleToSet).then(function () {
                 return setRoomHistoryVisibility(client, roomId, "joined");
             });
-        } else {
-            return setRoomHistoryVisibility(client, roomId, "joined");
         }
+        return setRoomHistoryVisibility(client, roomId, "joined");
     }, function (err) {
         if (err.errcode === "M_UNKNOWN") {
             // alias already taken, must be us. Join the room alias.
             return client.joinRoom(alias, { syncRoom: false }).then(function (r) {
                 return r.roomId;
             });
-        } else {
-            throw "Failed to create room: " + JSON.stringify(err);
         }
+        throw "Failed to create room: " + JSON.stringify(err);
     }).then(function (roomId) {
         return new MatrixRoom(roomId);
     });
@@ -230,25 +228,25 @@ MatrixLib.prototype.joinRoom = function (roomId, matrixUser) {
     // client is the specified matrix user or the bot if a matrix user isn't
     // specified.
     var opts = { syncRoom: false };
-    var lib = this;
+    var self = this;
     var defer = q.defer();
-    var client = matrixUser ? lib._getClient(matrixUser.userId) : lib._getClient();
+    var client = matrixUser ? self._getClient(matrixUser.userId) : self._getClient();
     client.joinRoom(roomId, opts).done(function (response) {
         defer.resolve(response);
     }, function (err) {
         if (err.errcode == "M_FORBIDDEN" && matrixUser) {
             // can the bot invite us? If so, join the send msg.
-            var botClient = lib._getClient();
+            var botClient = self._getClient();
             botClient.invite(roomId, matrixUser.userId).done(function (r) {
                 // now join.
                 client.joinRoom(roomId, opts).done(function (response) {
-                    lib.log.info("Joined room (bot invited).");
+                    self.log.info("Joined room (bot invited).");
                     defer.resolve(response);
-                }, function (err) {
-                    lib.log.error("joinRoom: Couldn't join room (bot invited): %s", JSON.stringify(err));
-                    defer.reject(err);
+                }, function (e) {
+                    self.log.error("joinRoom: Couldn't join room (bot invited): %s", JSON.stringify(e));
+                    defer.reject(e);
                 });
-            }, function (err) {
+            }, function (invErr) {
                 // the bot couldn't invite the user.
                 // try joining as the bot THEN inviting.
                 botClient.joinRoom(roomId, opts).then(function (response) {
@@ -256,11 +254,11 @@ MatrixLib.prototype.joinRoom = function (roomId, matrixUser) {
                 }).then(function (response) {
                     return client.joinRoom(roomId, opts);
                 }).done(function (response) {
-                    lib.log.info("Joined room (bot joined then invited).");
+                    self.log.info("Joined room (bot joined then invited).");
                     defer.resolve(response);
-                }, function (err) {
-                    lib.log.error("joinRoom: Couldn't join room (bot couldn't invite): %s", JSON.stringify(err));
-                    defer.reject(err);
+                }, function (e) {
+                    self.log.error("joinRoom: Couldn't join room (bot couldn't invite): %s", JSON.stringify(e));
+                    defer.reject(e);
                 });
             });
         } else {
@@ -296,23 +294,23 @@ MatrixLib.prototype.roomState = function (roomId, userId) {
     return client.roomState(roomId);
 };
 
-var setJoinRule = function setJoinRule(client, roomId, joinRule) {
+function setJoinRule(client, roomId, joinRule) {
     return client.sendStateEvent(roomId, "m.room.join_rules", {
         join_rule: joinRule
     }, "").then(function () {
         return roomId;
     });
-};
+}
 
-var setRoomHistoryVisibility = function setRoomHistoryVisibility(client, roomId, history_visibility) {
+function setRoomHistoryVisibility(client, roomId, history_visibility) {
     return client.sendStateEvent(roomId, "m.room.history_visibility", {
         "history_visibility": history_visibility
     }, "").then(function () {
         return roomId;
     });
-};
+}
 
-var setTopic = function setTopic(lib, room, from, topic) {
+function setTopic(lib, room, from, topic) {
     var defer = q.defer();
     var client = lib._getClient(from.userId);
     client.setRoomTopic(room.roomId, topic).then(function (suc) {
@@ -322,18 +320,18 @@ var setTopic = function setTopic(lib, room, from, topic) {
         defer.reject(err);
     });
     return defer.promise;
-};
+}
 
-var sendMessage = function sendMessage(lib, room, from, msgtype, text) {
+function sendMessage(lib, room, from, msgtype, text) {
     msgtype = msgtype || "m.text";
     var content = {
         msgtype: msgtype,
         body: text
     };
     return sendMessageEvent(lib, room, from, content);
-};
+}
 
-var sendHtml = function sendHtml(lib, room, from, msgtype, html) {
+function sendHtml(lib, room, from, msgtype, html) {
     msgtype = msgtype || "m.text";
     var fallback = html.replace(stripHtmlTags, "");
     var content = {
@@ -343,7 +341,7 @@ var sendHtml = function sendHtml(lib, room, from, msgtype, html) {
         formatted_body: html
     };
     return sendMessageEvent(lib, room, from, content);
-};
+}
 
 /**
  * @param {*} lib
@@ -355,7 +353,7 @@ var sendHtml = function sendHtml(lib, room, from, msgtype, html) {
  * @return {Promise} Which is resolved when the message has been sent, or
  * rejected if it failed to send.
  */
-var sendMessageEvent = function sendMessageEvent(lib, room, from, content, joinState, existingDefer) {
+function sendMessageEvent(lib, room, from, content, joinState, existingDefer) {
     var defer = existingDefer || q.defer();
     var client = lib._getClient(from.userId);
     client.sendMessage(room.roomId, content).then(function (suc) {
@@ -365,9 +363,9 @@ var sendMessageEvent = function sendMessageEvent(lib, room, from, content, joinS
             // try joining the room
             lib.joinRoom(room.roomId, from).done(function (response) {
                 sendMessageEvent(lib, room, from, content, "join", defer);
-            }, function (err) {
-                lib.log.error("sendMessageEvent: Failed to join room. %s", err);
-                defer.reject(err);
+            }, function (e) {
+                lib.log.error("sendMessageEvent: Failed to join room. %s", e);
+                defer.reject(e);
             });
         } else {
             lib.log.error("sendMessageEvent: %s", JSON.stringify(err));
@@ -375,9 +373,9 @@ var sendMessageEvent = function sendMessageEvent(lib, room, from, content, joinS
         }
     })["catch"](log.logErr);
     return defer.promise;
-};
+}
 
-var getMatrixUser = function getMatrixUser(userLocalpart, displayName) {
+function getMatrixUser(userLocalpart, displayName) {
     var defer = q.defer();
     var client = sdk.getClientAs();
 
@@ -424,13 +422,13 @@ var getMatrixUser = function getMatrixUser(userLocalpart, displayName) {
     }, createUserFn);
 
     return defer.promise;
-};
+}
 
 // IRC User -> Matrix User (Promise returned)
 module.exports.ircToMatrixUser = function (user) {
     if (user.protocol !== "irc") {
         log.error("Bad src protocol: %s", user.protocol);
-        return;
+        return null;
     }
     var userLocalpart = user.server.getUserLocalpart(user.nick);
     return getMatrixUser(userLocalpart, user.nick + " (IRC)");

@@ -216,7 +216,7 @@ module.exports.onPart = function (server, leavingUser, chan, kind) {
 
 module.exports.onMode = function (server, channel, by, mode, enabled, arg) {
     if (["k", "i"].indexOf(mode) === -1) {
-        return; // ignore everything but k and i
+        return q.reject("Unhandled mode"); // ignore everything but k and i
     }
     var req = requests.newRequest(true);
     req.log.info("onMode(%s) in %s by %s (arg=%s)", enabled ? "+" + mode : "-" + mode, channel, by, arg);

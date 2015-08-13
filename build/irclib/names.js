@@ -9,6 +9,20 @@ var log = require("../logging").get("irc-names");
 var queue = [];
 var processing = null;
 
+var sanitiseUsername = function sanitiseUsername(username, replacementChar) {
+    replacementChar = replacementChar || "";
+    username = username.toLowerCase();
+    // strip illegal chars according to RFC 1459 Sect 2.3.1
+    // (technically it's any <nonwhite> ascii for <user> but meh)
+    // also strip '_' since we use that as the delimiter
+    return username.replace(/[^A-Za-z0-9\]\[\^\\\{\}\-`]/g, replacementChar);
+};
+
+var sanitiseRealname = function sanitiseRealname(realname) {
+    // real name can be any old ASCII
+    return realname.replace(/[^\x00-\x7F]/g, "");
+};
+
 /**
  * Generate a new IRC username for the given Matrix user on the given server.
  * @param {string} domain The IRC server domain
@@ -96,20 +110,6 @@ var generateIdentUsername = function generateIdentUsername(domain, userId) {
     loop();
 
     return d.promise;
-};
-
-var sanitiseUsername = function sanitiseUsername(username, replacementChar) {
-    replacementChar = replacementChar || "";
-    username = username.toLowerCase();
-    // strip illegal chars according to RFC 1459 Sect 2.3.1
-    // (technically it's any <nonwhite> ascii for <user> but meh)
-    // also strip '_' since we use that as the delimiter
-    return username.replace(/[^A-Za-z0-9\]\[\^\\\{\}\-`]/g, replacementChar);
-};
-
-var sanitiseRealname = function sanitiseRealname(realname) {
-    // real name can be any old ASCII
-    return realname.replace(/[^\x00-\x7F]/g, "");
 };
 
 var checkQueue = function checkQueue() {

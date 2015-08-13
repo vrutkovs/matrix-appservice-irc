@@ -74,7 +74,7 @@ module.exports.beforeEach = function(testCase, env) {
     if (env) {
         env.ircMock._reset();
         env.clientMock._reset();
-        env.ircService = proxyquire("../../lib/irc-appservice.js", {
+        env.ircService = proxyquire("../../build/irc-appservice.js", {
             "matrix-js-sdk": env.clientMock,
             "irc": env.ircMock
         });

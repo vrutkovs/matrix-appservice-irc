@@ -4,7 +4,7 @@
 "use strict";
 var q = require("q");
 var Datastore = require("nedb");
-var store = require("../../lib/store");
+var store = require("../../build/store");
 
 /**
  * Reset the database, wiping all data.

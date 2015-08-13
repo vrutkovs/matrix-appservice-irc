@@ -1,0 +1,11 @@
+{
+  "parser": "babel-eslint",
+  "env": {
+    "node": true,
+    "jasmine": true
+  },
+  "rules": {
+    "no-debugger": 1,
+    "no-constant-condition": 1
+  }
+}

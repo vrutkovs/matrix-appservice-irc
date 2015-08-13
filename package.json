@@ -4,10 +4,13 @@
   "description": "IRC Bridge for matrix-appservice",
   "main": "index.js",
   "scripts": {
-    "test": "istanbul cover --report cobertura jasmine-node -- spec --verbose --junitreport --forceexit --captureExceptions",
-    "testonly": "jasmine-node spec --verbose --forceexit --captureExceptions",
-    "lint": "jshint -c .jshint lib spec && gjslint --unix_mode --disable 0131,0220 --max_line_length 90 -r lib/ -r spec/",
-    "check": "npm test && npm run lint"
+    "watch": "babel lib/ --out-dir build -D --watch",
+    "build": "babel lib/ --out-dir build -D",
+    "test": "npm run build && istanbul cover --report cobertura jasmine-node -- spec --verbose --junitreport --forceexit --captureExceptions",
+    "testonly": "npm run build && jasmine-node spec --verbose --forceexit --captureExceptions",
+    "lint": "eslint lib/ && gjslint --unix_mode --disable 0131,0220 --max_line_length 90 -r lib/ -r spec/",
+    "typecheck": "flow check lib/",
+    "check": "npm run build && npm run typecheck && npm run lint && npm run testonly"
   },
   "repository": {
     "type": "git",
@@ -19,8 +22,12 @@
     "url": "https://github.com/matrix-org/matrix-appservice-irc/issues"
   },
   "dependencies": {
+    "babel": "^5.8.21",
+    "babel-eslint": "^4.0.5",
     "crc": "^3.2.1",
+    "eslint": "^1.1.0",
     "extend": "^2.0.0",
+    "flow-bin": "^0.14.0",
     "fs": "0.0.2",
     "irc": "matrix-org/node-irc",
     "jayschema": "^0.3.1",

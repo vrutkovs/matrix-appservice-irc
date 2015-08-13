@@ -1,4 +1,4 @@
-var Validator = require("../../lib/config/validator");
+var Validator = require("../../build/config/validator");
 
 /**
  * Default test AS information

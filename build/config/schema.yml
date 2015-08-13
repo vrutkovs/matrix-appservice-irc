@@ -1,0 +1,217 @@
+"$schema": "http://json-schema.org/draft-04/schema#"
+type: "object"
+properties:
+    appService:
+        type: "object"
+        properties:
+            homeserver:
+                type: "object"
+                properties:
+                    url:
+                        type: "string"
+                    domain:
+                        type: "string"
+                required: ["url", "domain"]
+            appservice:
+                type: "object"
+                properties:
+                    url:
+                        type: "string"
+                    token:
+                        type: "string"
+                required: ["url", "token"]
+            http:
+                type: "object"
+                properties:
+                    port:
+                        type: "integer"
+                    maxSize:
+                        type: "integer"
+                required: ["port"]
+            localpart:
+                "type": "string"
+        required: ["homeserver", "appservice", "http"]
+    ircService:
+        type: "object"
+        properties:
+            databaseUri:
+                type: "string"
+            statsd:
+                type: "object"
+                properties:
+                    hostname:
+                        type: "string"
+                    port:
+                        type: "integer"
+                    jobName:
+                        type: "string"
+                required: ["hostname", "port"]
+            ident:
+                type: "object"
+                properties:
+                    enabled:
+                        type: "boolean"
+                    port:
+                        type: "integer"
+                required: ["enabled"]
+            logging:
+                type: "object"
+                properties:
+                    level:
+                        type: "string"
+                        enum: ["error","warn","info","debug"]
+                    logfile:
+                        type: "string"
+                    errfile:
+                        type: "string"
+                    toConsole:
+                        type: "boolean"
+                    maxFileSizeBytes:
+                        type: "integer"
+                    maxFiles:
+                        type: "integer"
+            servers:
+                type: "object"
+                # all properties must follow the following
+                additionalProperties:
+                    type: "object"
+                    properties:
+                        port:
+                            type: "integer"
+                        ssl:
+                            type: "boolean"
+                        botConfig:
+                            type: "object"
+                            properties:
+                                enabled:
+                                    type: "boolean"
+                                nick:
+                                    type: "string"
+                                password:
+                                    type: "string"
+                                joinChannelsIfNoUsers:
+                                    type: "boolean"
+                        privateMessages:
+                            type: "object"
+                            properties:
+                                enabled:
+                                    type: "boolean"
+                                exclude:
+                                    type: "array"
+                                    items:
+                                        type: "string"
+                        membershipLists:
+                            type: "object"
+                            properties:
+                                enabled:
+                                    type: "boolean"
+                                global:
+                                    type: "object"
+                                    properties:
+                                        ircToMatrix:
+                                            type: "object"
+                                            properties:
+                                                initial:
+                                                    type: "boolean"
+                                                incremental:
+                                                    type: "boolean"
+                                        matrixToIrc:
+                                            type: "object"
+                                            properties:
+                                                initial:
+                                                    type: "boolean"
+                                                incremental:
+                                                    type: "boolean"
+                                    additionalProperties: false
+                                rooms:
+                                    type: "array"
+                                    items:
+                                        type: "object"
+                                        properties:
+                                            room:
+                                                type: "string"
+                                                pattern: "^!+.*$"
+                                            matrixToIrc:
+                                                type: "object"
+                                                properties:
+                                                    initial:
+                                                        type: "boolean"
+                                                    incremental:
+                                                        type: "boolean"
+                                        additionalProperties: false
+                                channels:
+                                    type: "array"
+                                    items:
+                                        type: "object"
+                                        properties:
+                                            channel:
+                                                type: "string"
+                                                pattern: "^#+.*$"
+                                            ircToMatrix:
+                                                type: "object"
+                                                properties:
+                                                    initial:
+                                                        type: "boolean"
+                                                    incremental:
+                                                        type: "boolean"
+                                        additionalProperties: false
+                        dynamicChannels:
+                            type: "object"
+                            properties:
+                                enabled:
+                                    type: "boolean"
+                                published:
+                                    type: "boolean"
+                                createAlias:
+                                    type: "boolean"
+                                joinRule:
+                                    type: "string"
+                                    enum: ["invite", "public"]
+                                federate:
+                                    type: "boolean"
+                                aliasTemplate:
+                                    type: "string"
+                                    pattern: "^#.*\\$CHANNEL"
+                                whitelist:
+                                    type: "array"
+                                    items:
+                                        type: "string"
+                                        pattern: "^@.*"
+                                exclude:
+                                    type: "array"
+                                    items:
+                                        type: "string"
+                        mappings:
+                            type: "object"
+                            patternProperties:
+                                # must start with a #
+                                "^#+.*$":
+                                    type: "array"
+                                    items:
+                                        type: "string"
+                                    minItems: 1
+                                    uniqueItems: true
+                            additionalProperties: false
+                        matrixClients:
+                            type: "object"
+                            properties:
+                                userTemplate:
+                                    type: "string"
+                                    pattern: "^@.*\\$NICK"
+                                displayName:
+                                    type: "string"
+                                    pattern: "\\$NICK"
+                        ircClients:
+                            type: "object"
+                            properties:
+                                nickTemplate:
+                                    type: "string"
+                                    pattern: "\\$USERID|\\$LOCALPART|\\$DISPLAY"
+                                maxClients:
+                                    type: "integer"
+                                idleTimeout:
+                                    type: "integer"
+                                    minimum: 0
+                                allowNickChanges:
+                                    type: "boolean"
+        required: ["databaseUri", "servers"]

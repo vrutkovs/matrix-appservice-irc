@@ -6,11 +6,14 @@
   "scripts": {
     "watch": "babel lib/ --out-dir build -D --watch",
     "build": "babel lib/ --out-dir build -D",
-    "test": "npm run build && istanbul cover --report cobertura jasmine-node -- spec --verbose --junitreport --forceexit --captureExceptions",
-    "testonly": "npm run build && jasmine-node spec --verbose --forceexit --captureExceptions",
+    "test": "npm run build && jasmine-node spec --verbose --forceexit --captureExceptions",
     "lint": "eslint lib/ && gjslint --unix_mode --disable 0131,0220 --max_line_length 90 -r lib/ -r spec/",
     "typecheck": "flow check lib/",
-    "check": "npm run build && npm run typecheck && npm run lint && npm run testonly"
+    "check": "npm run typecheck && npm run lint && npm run testonly",
+    "ci-typecheck": "flow check lib/ --json > ci-typecheck.json",
+    "ci-test": "npm run build && istanbul cover --report cobertura jasmine-node -- spec --verbose --junitreport --forceexit --captureExceptions",
+    "ci-lint": "eslint lib/ --format checkstyle > ci-lint.xml && gjslint --unix_mode --disable 0131,0220,0200,0222 --max_line_length 90 -r lib/ -r spec/ > ci-style.log",
+    "ci": "npm run ci-typecheck && npm run ci-lint && npm run ci-test"
   },
   "repository": {
     "type": "git",

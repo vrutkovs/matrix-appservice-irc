@@ -3,10 +3,10 @@ var yaml = require("js-yaml");
 var fs = require("fs");
 var nopt = require("nopt");
 
-var Validator = require("./lib/config/validator");
+var Validator = require("./build/config/validator");
 var AppService = require("matrix-appservice").AppService;
-var irc = require("./lib/irc-appservice.js");
-var hotReload = require("./lib/hot-reload.js");
+var irc = require("./build/irc-appservice.js");
+var hotReload = require("./build/hot-reload.js");
 
 var opts = nopt({
     "generate-registration": Boolean,

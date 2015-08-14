@@ -3,6 +3,7 @@ data
 appservice-registration-irc.yaml
 spec-db
 ci-*
+build
 
 # Logs
 logs

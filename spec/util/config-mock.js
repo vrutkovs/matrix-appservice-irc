@@ -4,7 +4,7 @@ var Validator = require("../../build/config/validator");
  * Default test AS information
  */
 module.exports = {
-    databaseUri: "nedb://spec-db",
+    databaseUri: "nedb://spec/spec-db",
     homeServerUrl: "https://some.home.server.goeshere",
     homeServerDomain: "some.home.server",
     homeServerToken: "foobar",

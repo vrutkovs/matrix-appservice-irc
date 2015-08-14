@@ -10,7 +10,7 @@
     "lint": "eslint lib/",
     "typecheck": "flow check lib/",
     "check": "npm run typecheck && npm run lint && npm run test",
-    "ci-typecheck": "flow check lib/ --json > ci-typecheck.json || true",
+    "ci-typecheck": "flow check lib/ > ci-typecheck.log || true",
     "ci-test": "npm run build && istanbul cover --report cobertura jasmine-node -- spec --verbose --junitreport --forceexit --captureExceptions || true",
     "ci-lint": "eslint lib/ --format checkstyle > ci-lint.xml || true",
     "ci": "npm run ci-typecheck; npm run ci-lint; npm run ci-test"

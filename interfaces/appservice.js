@@ -6,3 +6,20 @@ declare class AppService {
     onUserQuery: Function;
     onAliasQuery: Function;
 }
+
+declare class Request {
+    id: string;
+    defer: Object;
+    log: Object;
+    isFromIrc: boolean;
+    start: number;
+    errFn: Function;
+    sucFn: Function;
+    mxLib: Object;
+    ircLib: Object;
+
+    getPromise(): Object;
+    getDuration(): number;
+    reject(thing: any): void;
+    resolve(thing: any): void;
+}

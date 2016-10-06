@@ -5,6 +5,7 @@ New features:
  - A new server config item, ```reconnectIntervalMs``` has been added and is used to throttle reconnections to an IRC server in a queue, where one reconnection is serviced per interval.
  - When sending a large chunk of text in a matrix message, the bridge can be configured (with (```lineLimit```) to limit the number of IRC messages that can be sent before bundling them up into one big text file and sending the resulting URL that links back the the text on a matrix media repo.
  - Added Third Party Lookup.
+ - Added config ```floodDelayMs``` which is used to drip feed membership entries at the specified rate.
 
 Improvements:
  - Provisioning:
@@ -27,7 +28,6 @@ Improvements:
  - Better information given in admin rooms.
  - Log the length of the queues in the reconnection scheduler.
  - Sync +s mode in chanels with room visibility. +s = 'private', -s = 'public'.
- - Replace hard-coded constant ```JOIN_WAIT_TIME_MS``` with config ```floodDelayMs```.
 
 Bug fixes:
  - Room alias requests can only be done for channels that start with ```#``` to avoid confusion with people not being able to join ```#ircnetwork_somechannel:domain.com```. The important thing being the missing ```#``` before ```somechannel```.

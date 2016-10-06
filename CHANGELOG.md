@@ -30,8 +30,8 @@ Improvements:
  - Replace hard-coded constant ```JOIN_WAIT_TIME_MS``` with config ```floodDelayMs```.
 
 Bug fixes:
- - Room alias requests can only be done for valid channels now.
- - Prevent admin room from being created when plumbing.
+ - Room alias requests can only be done for channels that start with ```#``` to avoid confusion with people not being able to join ```#ircnetwork_somechannel:domain.com```. The important thing being the missing ```#``` before ```somechannel```.
+ - Prevent admin room from being created when plumbing. Previously, the bot would treat a linked room as an admin room, and so allow users to issue commands in it (but only after unlinking again).
  - If the bot is enabled, join a channel when linked.
  - Part IRC clients which should no longer be in a channel due to unlinking.
  - When an IPv6 prefix is provided, assume outgoing IRC connections will be IPv6.

@@ -1,4 +1,4 @@
-Changes in 0.5.0
+Changes in 0.5.0 (2016-10-06)
 ================
 
 New features:

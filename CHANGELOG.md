@@ -3,7 +3,6 @@ Changes in 0.5.0 (2016-10-06)
 
 New features:
  - A new server config item, ```reconnectIntervalMs``` has been added and is used to throttle reconnections to an IRC server in a queue, where one reconnection is serviced per interval.
- - When sending a large chunk of text in a matrix message, the bridge can be configured (with (```lineLimit```) to limit the number of IRC messages that can be sent before bundling them up into one big text file and sending the resulting URL that links back the the text on a matrix media repo.
  - Added Third Party Lookup - for mapping IRC user/channel names into Matrix user IDs or room aliases.
  - Added config ```floodDelayMs``` which is used to drip feed membership entries at the specified rate when syncing membership.
 

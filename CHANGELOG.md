@@ -1,3 +1,44 @@
+Changes in 0.5.0
+================
+
+New features:
+ - A new server config item, ```reconnectIntervalMs``` has been added and is used to throttle reconnections to an IRC server in a queue, where one reconnection is serviced per interval.
+ - When sending a large chunk of text in a matrix message, the bridge can be configured (with (```lineLimit```) to limit the number of IRC messages that can be sent before bundling them up into one big text file and sending the resulting URL that links back the the text on a matrix media repo.
+ - Added Third Party Lookup.
+
+Improvements:
+ - Provisioning:
+   - Provisioning of mappings has been improved by requiring that an IRC channel operator (or admin) in the plumbed channel respond with 'yes'/'y' before the mapping can be created to prevent abuse.
+   - During provisioning, matrix room state ```m.room.bridging``` is used in the room in the new mapping to signal whether the status of the bridging is 'pending', 'success', or 'failure':
+    ```JS
+    {
+        content: {
+            bridger: 'nick',
+            status: 'pending'
+        }
+    }
+    ```
+   - Route loops are now prevented using ```m.room.bridging``` as an indication that bridging exists.
+   - The ```queryLink``` endpoint for asking for a list of operators in a given channel has been added. This list is acquired through the bot joining a channel, but they are cached temporarily to reduce join/part spam.
+   - The ```queryNetworks``` endpoint was added and can be used to query the available networks on the  bridge.
+   - The IRC bot will leave a channel if it is no longer mapped to any other upon unlinking. The matrix bot will also leave an totally unlinked room.
+   - Better error message are given when linking.
+   - Only moderators in a matrix room can unlink.
+ - Better information given in admin rooms.
+ - Log the length of the queues in the reconnection scheduler.
+ - Sync +s mode in chanels with room visibility. +s = 'private', -s = 'public'.
+ - Replace hard-coded constant ```JOIN_WAIT_TIME_MS``` with config ```floodDelayMs```.
+
+Bug fixes:
+ - Room alias requests can only be done for valid channels now.
+ - Third Party Lookup is disabled if dynamicChannels is disabled.
+ - Prevent admin room from being created when plumbing.
+ - If the bot is enabled, join a channel when linked.
+ - Part IRC clients which should no longer be in a channel due to unlinking.
+ - When an IPv6 prefix is provided, assume outgoing IRC connections will be IPv6.
+ - Do not cache stale clients in the client pool.
+
+
 Changes in 0.4.0
 ================
 
@@ -33,8 +74,6 @@ Bug fixes:
    reconnections.
  - Fixed a bug which caused the static config mappings to be preserved even when
    they were changed in `config.yaml`.
-
-
 
 Changes in 0.3.1
 ================
@@ -88,7 +127,7 @@ This update implements full `matrix-appservice-bridge` support in the IRC bridge
         node app.js -r [-f /path/to/save/registration.yaml] -u 'http://localhost:6789/appservice' -c CONFIG_FILE [-l my-app-service]
         ```
     * To run the bridge:
-    
+
       ```
       node -c CONFIG_FILE [-f /path/to/load/registration.yaml] [-p NUMBER]
       ```

@@ -31,7 +31,6 @@ Improvements:
 
 Bug fixes:
  - Room alias requests can only be done for valid channels now.
- - Third Party Lookup is disabled if dynamicChannels is disabled.
  - Prevent admin room from being created when plumbing.
  - If the bot is enabled, join a channel when linked.
  - Part IRC clients which should no longer be in a channel due to unlinking.

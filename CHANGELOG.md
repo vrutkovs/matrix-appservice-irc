@@ -36,7 +36,7 @@ Bug fixes:
  - If the bot is enabled, join a channel when linked.
  - Part IRC clients which should no longer be in a channel due to unlinking.
  - When an IPv6 prefix is provided, assume outgoing IRC connections will be IPv6.
- - Do not cache stale clients in the client pool.
+ - Do not cache stale clients in the client pool. Previously, stale BridgedClients would be left in the client pool if the bot was disconnected and then reconnected. These stale clients would be returned by clientPool.getBot(server).
 
 
 Changes in 0.4.0

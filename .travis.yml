@@ -1,0 +1,13 @@
+sudo: required
+
+services:
+  - docker
+
+script:
+  - if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then
+      docker build -t vrutkovs/matrix-appservice-irc . &&
+      docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" &&
+      docker push vrutkovs/matrix-appservice-irc;
+    fi
+notifications:
+  webhooks: https://hubot.vrutkovs.eu/travis-ci/103761953

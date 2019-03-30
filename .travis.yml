@@ -1,30 +1,13 @@
-language: node_js
-install: npm install
+sudo: required
 
-jobs:
-    include:
-    - stage: tests
-      name: "Unit + Integration Node 6"
-      script: npm run test
-      node_js: "6"
-    - script: npm run test
-      name: "Unit + Integration Node 8"
-      node_js: "8"
-    - script: npm run test
-      name: "Unit + Integration Node 10"
-      node_js: "10"
+services:
+  - docker
 
-    - script: npm run lint
-      name: "Linting"
-      node_js: "10"
-    - script: npm run ci-test
-      name: "Coverage"
-      node_js: "10"
-
+script:
+  - if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then
+      docker build -t vrutkovs/matrix-appservice-irc . &&
+      docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" &&
+      docker push vrutkovs/matrix-appservice-irc;
+    fi
 notifications:
-    webhooks:
-        urls:
-            - "https://scalar.vector.im/api/neb/services/hooks/dHJhdmlzLWNpLyU0MGtlZ2FuJTNBbWF0cml4Lm9yZy8lMjFTdWR2aU9KbGltRHZyR2RGQ1klM0FtYXRyaXgub3Jn"
-        on_success: change  # always|never|change
-        on_failure: change
-        on_start: never
+  webhooks: https://hubot.vrutkovs.eu/travis-ci/103761953

@@ -26,9 +26,6 @@ RUN openssl genpkey -out ./data/passkey.pem -outform PEM -algorithm RSA -pkeyopt
 COPY --from=builder /node_modules /app/node_modules
 COPY --from=builder /freebindfree/libfreebindfree.so /app/libfreebindfree.so
 
-COPY config.yaml /app/config.yaml
-COPY passkey.pem /app/passkey.pem
-COPY appservice-registration-irc.yaml /app/appservice-registration-irc.yaml
 COPY app.js /app/
 COPY lib /app/lib
 COPY docker /app/docker
